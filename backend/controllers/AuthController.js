@@ -1,13 +1,15 @@
+import "../env.js";
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import MailController from "./MailController.js";
 import sendMail from "./MailController.js";
 import passport from "../passport.js";
-import dotenv from "dotenv";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
-dotenv.config();
 
 const AuthController = express();
 AuthController.use(express.json());
@@ -49,6 +51,9 @@ AuthController.post("/login", async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
+    if (!user.password) {
+      return res.status(400).json({ message: "This account uses Google/GitHub sign-in" });
+    }
 
     //password matching...
     const isMatch = await bcrypt.compare(password, user.password);
@@ -63,10 +68,10 @@ AuthController.post("/login", async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || "1d" },
     );
 
-    //send mail...
+    //send mail in the background so a slow/unconfigured SMTP server never blocks login
     const subject = "Login Notification";
     const text = `Hi ${user.username},\n\nThis is a notification that your account was just accessed. If this was you, you can safely ignore this email.`;
-    await sendMail({ to: user.email, subject, text });
+    sendMail({ to: user.email, subject, text });
 
     res.status(200).json({
       message: "Login successful",
@@ -89,15 +94,25 @@ AuthController.post("/login", async (req, res) => {
   }
 });
 
+// Return a clear error instead of crashing when an OAuth provider isn't configured
+const requireStrategy = (name) => (req, res, next) => {
+  if (!passport._strategy(name)) {
+    return res.status(503).json({ message: `${name} login is not configured on this server` });
+  }
+  next();
+};
+
 // Google Auth
 AuthController.get(
   "/google",
+  requireStrategy("google"),
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 AuthController.get(
   "/google/callback",
-  passport.authenticate("google", { session: false, failureRedirect: "/login" }),
+  requireStrategy("google"),
+  passport.authenticate("google", { session: false, failureRedirect: `${process.env.FRONTEND_URL || "http://localhost:5173"}/login` }),
   (req, res) => {
     const token = jwt.sign(
       { id: req.user._id, email: req.user.email },
@@ -122,12 +137,14 @@ AuthController.get(
 // GitHub Auth
 AuthController.get(
   "/github",
+  requireStrategy("github"),
   passport.authenticate("github", { scope: ["user:email"] })
 );
 
 AuthController.get(
   "/github/callback",
-  passport.authenticate("github", { session: false, failureRedirect: "/login" }),
+  requireStrategy("github"),
+  passport.authenticate("github", { session: false, failureRedirect: `${process.env.FRONTEND_URL || "http://localhost:5173"}/login` }),
   (req, res) => {
     const token = jwt.sign(
       { id: req.user._id, email: req.user.email },
@@ -183,19 +200,15 @@ AuthController.get("/profile", verifyToken, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-
-// Ensure uploads directory exists
-const uploadDir = 'uploads';
+// Ensure uploads directory exists (resolved from backend/ so it matches the static route in server.js)
+const uploadDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "uploads");
 if (!fs.existsSync(uploadDir)){
-    fs.mkdirSync(uploadDir);
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -260,17 +273,15 @@ AuthController.put("/profile", verifyToken, upload.single('avatarFile'), async (
 
 //todo
 //delete profile
-AuthController.delete("/deactivate", async (req, res) => {
+AuthController.delete("/deactivate", verifyToken, async (req, res) => {
   try {
-    const { username } = req.body;
-    const exist = await User.findOne({ username });
-    if (!exist) return res.status(404).json({ message: "user not availble" });
-    const deletedUser = await User.findByIdAndDelete({ username });
-    if (!deletedUser)
-      return res.status(400).json({ message: "error deleting" });
+    const deletedUser = await User.findByIdAndDelete(req.user.id);
+    if (!deletedUser) return res.status(404).json({ message: "user not availble" });
 
     res.status(200).json({ message: "profile deleted successfuly" });
-  } catch (err) { }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 export default AuthController;

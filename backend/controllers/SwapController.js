@@ -3,9 +3,8 @@ import jwt from "jsonwebtoken";
 import SwapRequest from "../models/SwapRequest.js";
 import User from "../models/User.js";
 import Message from "../models/Message.js";
-import dotenv from "dotenv";
+import "../env.js";
 
-dotenv.config();
 
 const SwapController = express.Router();
 
