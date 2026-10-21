@@ -1,5 +1,5 @@
+import "./env.js";
 import express from "express";
-import dotenv from "dotenv";
 import compression from "compression";
 import AuthController from "./controllers/AuthController.js";
 import SwapController from "./controllers/SwapController.js";
@@ -10,7 +10,15 @@ import sendMail from "./controllers/MailController.js";
 import cors from "cors";
 import session from "express-session";
 import passport from "./passport.js";
-dotenv.config();
+
+// Fail fast with a clear message instead of crashing later on the first request
+const requiredEnv = ["MONGODB_URI", "JWT_SECRET"];
+const missingEnv = requiredEnv.filter((key) => !process.env[key]);
+if (missingEnv.length) {
+  console.error(`Missing required environment variables: ${missingEnv.join(", ")}`);
+  console.error("Copy backend/.env.example to backend/.env and fill in the values.");
+  process.exit(1);
+}
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -22,9 +30,13 @@ const app = express();
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const PORT = process.env.PORT || 3000;
-const allowedOrigins = ['http://localhost:5173', 'https://skill-swap-henna-mu.vercel.app'];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://skill-swap-henna-mu.vercel.app',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+  ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim()) : []),
+];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -35,6 +47,8 @@ app.use(cors({
   },
   credentials: true,
 }));
+// Served after CORS so the frontend can fetch() avatars (see utils/avatarCache.js)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "skillswap_secret",

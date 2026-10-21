@@ -269,7 +269,7 @@ const Profile = () => {
         <Grid container spacing={3}>
           
           {/* Main Left Column */}
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             
             {/* 1. Profile Header */}
             <Paper 
@@ -318,7 +318,7 @@ const Profile = () => {
                   <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
                     {user?.bio}
                   </Typography>
-                  <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', sm: 'flex-start' }} alignItems="center" sx={{ color: 'text.secondary' }}>
+                  <Stack direction="row" spacing={1} sx={{ justifyContent: { xs: 'center', sm: 'flex-start' }, alignItems: "center", color: 'text.secondary' }}>
                     <LocationIcon fontSize="small" />
                     <Typography variant="body2">{user?.location}</Typography>
                   </Stack>
@@ -444,7 +444,7 @@ const Profile = () => {
             </Typography>
             <Grid container spacing={3} sx={{ mb: 4 }}>
               {dummyProjects.map((project) => (
-                <Grid item xs={12} sm={6} key={project.id}>
+                <Grid size={{ xs: 12, sm: 6 }} key={project.id}>
                   <Card 
                     elevation={0} 
                     sx={{ 
@@ -487,7 +487,7 @@ const Profile = () => {
                 <Typography variant="h6" fontWeight="bold">
                   Ratings & Reviews
                 </Typography>
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                   <Rating value={4.5} precision={0.5} readOnly size="small" />
                   <Typography variant="body2" fontWeight="700">4.5 / 5.0</Typography>
                 </Stack>
@@ -525,7 +525,7 @@ const Profile = () => {
           </Grid>
 
           {/* Right Sidebar */}
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             
             {/* 5. Profile Completion */}
             <Paper elevation={0} sx={{ p: 3, borderRadius: 4, mb: 3, border: '1px solid #e5e7eb', boxShadow: '0 4px 15px rgba(0,0,0,0.04)' }}>

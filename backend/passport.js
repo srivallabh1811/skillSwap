@@ -1,10 +1,8 @@
+import "./env.js";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import User from "./models/User.js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -19,13 +17,16 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
+// OAuth strategies are only registered when their credentials are set in .env
+const backendUrl = process.env.BACKEND_URL || "";
+
 // Google Strategy
-passport.use(
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID || "PLACEHOLDER",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "PLACEHOLDER",
-      callbackURL: "/api/auth/google/callback",
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: `${backendUrl}/api/auth/google/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -55,12 +56,12 @@ passport.use(
 );
 
 // GitHub Strategy
-passport.use(
+if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) passport.use(
   new GitHubStrategy(
     {
-      clientID: process.env.GITHUB_CLIENT_ID || "PLACEHOLDER",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "PLACEHOLDER",
-      callbackURL: "/api/auth/github/callback",
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: `${backendUrl}/api/auth/github/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

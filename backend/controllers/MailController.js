@@ -1,19 +1,23 @@
-import dotenv from "dotenv";
+import "../env.js";
 import nodemailer from "nodemailer";
-dotenv.config();
 
 const sendMail = async ({ to, subject, text }) => {
+  // Email is optional: skip quietly when SMTP credentials aren't configured
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    return;
+  }
+
   //transporter setup
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "rajitmaurya250@gmail.com",
-      pass: process.env.EMAIL_PASSWORD, // Make sure to set PASS in your .env file
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD, // Gmail App Password, set in .env
     },
   });
 
   const mailOptions = {
-    from: "rajitmaurya25@gmail.com",
+    from: process.env.EMAIL_USER,
     to: to,
     subject: subject,
     text: text,

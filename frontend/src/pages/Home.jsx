@@ -87,8 +87,8 @@ const Home = () => {
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
-            justifyContent="center"
-            sx={{ px: { xs: 2, sm: 0 } }}
+
+            sx={{ justifyContent: "center", px: { xs: 2, sm: 0 } }}
           >
             <Button
               variant="contained"
@@ -140,7 +140,7 @@ const Home = () => {
             bgcolor: "#fff"
           }}
         >
-          <Stack direction="row" spacing={1} justifyContent="center" alignItems="center" sx={{ mb: 3 }}>
+          <Stack direction="row" spacing={1} sx={{ justifyContent: "center", alignItems: "center", mb: 3 }}>
             <TrendingIcon color="primary" />
             <Typography variant="subtitle2" fontWeight={800} sx={{ textTransform: "uppercase", letterSpacing: "0.1em", color: "#6b7280" }}>Trending Skills</Typography>
           </Stack>
@@ -170,8 +170,8 @@ const Home = () => {
         <Typography
           variant="h4"
           fontWeight={900}
-          textAlign="center"
           sx={{
+            textAlign: "center",
             mb: { xs: 4, md: 6 },
             fontSize: { xs: "1.75rem", md: "2.125rem" }
           }}
@@ -180,7 +180,7 @@ const Home = () => {
         </Typography>
         <Grid container spacing={{ xs: 3, md: 4 }}>
           {featuredUsers.map((user, i) => (
-            <Grid item xs={12} sm={6} md={4} key={i}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
               <Card
                 elevation={0}
                 sx={{
@@ -197,7 +197,7 @@ const Home = () => {
                   >
                     {user.avatar}
                   </Avatar>
-                  <Stack direction="row" spacing={0.5} justifyContent="center" alignItems="center" sx={{ mb: 0.5 }}>
+                  <Stack direction="row" spacing={0.5} sx={{ justifyContent: "center", alignItems: "center", mb: 0.5 }}>
                     <Typography variant="h6" fontWeight="800">{user.name}</Typography>
                     <VerifiedIcon sx={{ fontSize: 18, color: "#3b82f6" }} />
                   </Stack>
@@ -223,8 +223,8 @@ const Home = () => {
           <Typography
             variant="h4"
             fontWeight={900}
-            textAlign="center"
             sx={{
+              textAlign: "center",
               mb: { xs: 6, md: 8 },
               fontSize: { xs: "1.75rem", md: "2.125rem" }
             }}
@@ -233,7 +233,7 @@ const Home = () => {
           </Typography>
           <Grid container spacing={{ xs: 4, md: 4 }}>
             {steps.map((step, i) => (
-              <Grid item xs={12} sm={6} md={3} key={i}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
                 <Box sx={{ textAlign: "center", p: { xs: 1, md: 0 } }}>
                   <Box sx={{ width: 70, height: 70, borderRadius: "20px", bgcolor: "#fff", display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 3, boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
                     {step.icon}

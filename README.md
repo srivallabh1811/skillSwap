@@ -71,6 +71,51 @@ To build a platform where **knowledge becomes currency** and anyone can learn an
 
 ---
 
+##  Getting Started (Local Setup)
+
+**Prerequisites:** Node.js 20+ and MongoDB (local install, Docker, or a free MongoDB Atlas cluster).
+
+```bash
+# Start MongoDB with Docker (skip if you use a local install or Atlas)
+docker run -d --name skillswap-mongo -p 27017:27017 mongo:7
+```
+
+### 1. Backend
+
+```bash
+cd backend
+cp .env.example .env      # then edit .env (at least MONGODB_URI and JWT_SECRET)
+npm install
+npm run dev               # http://localhost:3000
+```
+
+### 2. Frontend (in a second terminal)
+
+```bash
+cd frontend
+cp .env.example .env      # defaults point to http://localhost:3000
+npm install
+npm run dev               # http://localhost:5173
+```
+
+### Environment variables
+
+| File | Variable | Required | Purpose |
+|---|---|---|---|
+| `backend/.env` | `MONGODB_URI` | Yes | MongoDB connection string |
+| `backend/.env` | `JWT_SECRET` | Yes | Secret used to sign login tokens |
+| `backend/.env` | `PORT`, `JWT_EXPIRES_IN`, `SESSION_SECRET` | No | Server port (3000), token lifetime (1d), session secret |
+| `backend/.env` | `FRONTEND_URL`, `BACKEND_URL`, `CORS_ORIGINS` | No | URLs used for OAuth redirects and CORS |
+| `backend/.env` | `EMAIL_USER`, `EMAIL_PASSWORD` | No | Gmail + App Password for login notification emails |
+| `backend/.env` | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | No | Enables "Continue with Google" |
+| `backend/.env` | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | No | Enables "Continue with GitHub" |
+| `frontend/.env` | `VITE_API_URL` | No | REST API URL (default `http://localhost:3000/api`) |
+| `frontend/.env` | `VITE_API_BASE_URL` | No | Socket.io URL (default `http://localhost:3000`) |
+
+`.env` files are git-ignored. Never commit real secrets.
+
+---
+
 ##  Future Improvements
 
 -  Real-time chat (Socket.io)  

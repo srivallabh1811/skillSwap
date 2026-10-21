@@ -11,6 +11,7 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemButton,
   ListItemAvatar,
   Avatar,
   ListItemText,
@@ -216,9 +217,11 @@ const Chat = () => {
                 size="small"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                InputProps={{
-                  startAdornment: <SearchIcon sx={{ color: "var(--text-muted)", mr: 1, fontSize: 20 }} />,
-                  sx: { borderRadius: "12px", bgcolor: "var(--surface-color)", '& fieldset': { border: 'none' } }
+                slotProps={{
+                  input: {
+                    startAdornment: <SearchIcon sx={{ color: "var(--text-muted)", mr: 1, fontSize: 20 }} />,
+                    sx: { borderRadius: "12px", bgcolor: "var(--surface-color)", '& fieldset': { border: 'none' } }
+                  }
                 }}
               />
             </Box>
@@ -231,8 +234,7 @@ const Chat = () => {
               ) : (
                 filteredConversations.map((conv) => (
                   <React.Fragment key={conv._id || conv.id}>
-                    <ListItem 
-                      button 
+                    <ListItemButton
                       onClick={() => handleSelectChat(conv)}
                       selected={(activeChat?._id || activeChat?.id) === (conv._id || conv.id)}
                       sx={{ 
@@ -253,7 +255,7 @@ const Chat = () => {
                         primary={<Typography fontWeight={700}>{conv.name || conv.username}</Typography>}
                         secondary={<Typography variant="body2" color="var(--text-muted)" noWrap>Click to view chat</Typography>}
                       />
-                    </ListItem>
+                    </ListItemButton>
                     <Divider sx={{ mx: 2, opacity: 0.5 }} />
                   </React.Fragment>
                 ))
@@ -293,7 +295,7 @@ const Chat = () => {
                   </Avatar>
                   <Box>
                     <Typography fontWeight={800}>{activeChat.name || activeChat.username}</Typography>
-                    <Stack direction="row" spacing={0.5} alignItems="center">
+                    <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
                       <CircleIcon sx={{ fontSize: 8, color: "#10b981" }} />
                       <Typography variant="caption" color="var(--text-muted)">Active now</Typography>
                     </Stack>
@@ -327,7 +329,7 @@ const Chat = () => {
                               overflow: "hidden"
                             }}>
                               {/* Header */}
-                              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                              <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 2 }}>
                                 <Box sx={{ 
                                   width: 32, 
                                   height: 32, 
@@ -377,7 +379,7 @@ const Chat = () => {
                                 {isPending ? (
                                   isMe ? (
                                     /* Sender pending state */
-                                    <Stack direction="row" spacing={1} alignItems="center" sx={{ color: "var(--primary)" }}>
+                                    <Stack direction="row" spacing={1} sx={{ alignItems: "center", color: "var(--primary)" }}>
                                       <Box sx={{ 
                                         width: 8, 
                                         height: 8, 
@@ -494,8 +496,10 @@ const Chat = () => {
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         autoComplete="off"
-                        InputProps={{
-                          sx: { borderRadius: "16px", bgcolor: "var(--surface-color)", '& fieldset': { border: 'none' } }
+                        slotProps={{
+                          input: {
+                            sx: { borderRadius: "16px", bgcolor: "var(--surface-color)", '& fieldset': { border: 'none' } }
+                          }
                         }}
                       />
                       <IconButton 
@@ -531,7 +535,7 @@ const Chat = () => {
                   <SendIcon sx={{ fontSize: 32, color: "var(--primary)", transform: "rotate(-45deg)", ml: 0.5 }} />
                 </Box>
                 <Typography variant="h6" fontWeight={800} color="var(--text-main)" gutterBottom>Your Messages</Typography>
-                <Typography variant="body2" textAlign="center" maxWidth={300}>Select a conversation to start chatting with your mentors and peers.</Typography>
+                <Typography variant="body2" sx={{ textAlign: "center", maxWidth: 300 }}>Select a conversation to start chatting with your mentors and peers.</Typography>
               </Box>
             )}
           </Box>
